@@ -57,8 +57,8 @@ class PGProto:
 
     def __draw_grid(self) -> None:
         for i in range(0, 600, floor(Constants.PIXELS_PER_SQUARE)):
-            self.__renderer.line(self.__screen, (255, 255, 255), (0, i), (Constants.WINDOW_SIZE[0], i), 1)
-            self.__renderer.line(self.__screen, (255, 255, 255), (i, 0), (i, Constants.WINDOW_SIZE[1]), 1)
+            self.__renderer.line(self.__screen, (255, 255, 255), (0, i), (Constants.WINDOW_SIZE.x, i), 1)
+            self.__renderer.line(self.__screen, (255, 255, 255), (i, 0), (i, Constants.WINDOW_SIZE.y), 1)
 
     def __draw_positions(self) -> None:
         if self.__player_pos is not None:
