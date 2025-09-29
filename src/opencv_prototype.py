@@ -43,71 +43,71 @@ def calibration_updated(event, x, y, flags, param) -> None:
 
 class CVProto:
     def __init__(self, source: Source, image_path: Optional[Path] = None, capture_device_id: Optional[int] = None):
-        self.__is_window_running: bool = True
-        self.__source = source
+        self._is_window_running: bool = True
+        self._source = source
         
         if source == Source.OBS:
-            self.__is_window_running = self.__initialize_capture(capture_device_id)
+            self._is_window_running = self._initialize_capture(capture_device_id)
         elif source == Source.TEST_SAMPLES or source == Source.USER_PATH:
-            self.__is_window_running = self.__initialize_images(image_path)
+            self._is_window_running = self._initialize_images(image_path)
         else:
-            self.__is_window_running: bool = False
+            self._is_window_running: bool = False
             print("Source is not defined")
 
-        self.__initialize_trackbar()
-        self.__initialize_window()
+        self._initialize_trackbar()
+        self._initialize_window()
 
-        self.__show_image: bool = False
+        self._show_image: bool = False
             
-    def __initialize_capture(self, capture_device_id: Optional[int]) -> bool:
+    def _initialize_capture(self, capture_device_id: Optional[int]) -> bool:
         global img
 
         if capture_device_id is None:
                 print("Bad video device: Invalid ID")
                 return False
 
-        self.__cap = cv.VideoCapture(capture_device_id)
+        self._cap = cv.VideoCapture(capture_device_id)
 
-        if not self.__cap.isOpened():
+        if not self._cap.isOpened():
             print("Bad video device: Can\'t open device")
             return False
         
-        self.__cap.set(cv.CAP_PROP_FRAME_WIDTH, Constants.WINDOW_SIZE.x)
-        self.__cap.set(cv.CAP_PROP_FRAME_HEIGHT, Constants.WINDOW_SIZE.y)
+        self._cap.set(cv.CAP_PROP_FRAME_WIDTH, Constants.WINDOW_SIZE.x)
+        self._cap.set(cv.CAP_PROP_FRAME_HEIGHT, Constants.WINDOW_SIZE.y)
 
-        _, img = self.__cap.read()
+        _, img = self._cap.read()
 
         return True
 
-    def __initialize_images(self, path: Optional[Path]) -> bool:
+    def _initialize_images(self, path: Optional[Path]) -> bool:
         global img
         
-        if path is None and self.__source == Source.TEST_SAMPLES:
+        if path is None and self._source == Source.TEST_SAMPLES:
             path = Constants.TEST_SAMPLES_PATH
 
         if path is None or not path.exists():
             print("Bad path: Path is none")
             return False
 
-        self.__images_path = utils.get_images_path(path)
+        self._images_path = utils.get_images_path(path)
 
-        if len(self.__images_path) == 0:
+        if len(self._images_path) == 0:
             print("Bad path: Image files empty")
             return False
         
-        self.__image_index = 0
-        self.__previous_index = 0
-        img_path = self.__images_path[self.__image_index].absolute()
+        self._image_index = 0
+        self._previous_index = 0
+        img_path = self._images_path[self._image_index].absolute()
         img = cv.imread(str(img_path))
         print("Image loaded: ", img_path.name)
 
         return True
 
-    def __initialize_trackbar(self) -> None:
+    def _initialize_trackbar(self) -> None:
         nothing = lambda x: None
 
         cv.namedWindow("Calibration", cv.WINDOW_NORMAL)
-        cv.resizeWindow("Calibration", 530, 232)
+        cv.resizeWindow("Calibration", 530, 230)
         cv.createTrackbar("Lower Hue", "Calibration", 0, 180, nothing)
         cv.createTrackbar("Lower Saturation", "Calibration", 0, 255, nothing)
         cv.createTrackbar("Lower Value", "Calibration", 0, 255, nothing)
@@ -129,11 +129,11 @@ class CVProto:
 
         cv.setMouseCallback("Calibration", calibration_updated)
 
-    def __initialize_window(self) -> None:
+    def _initialize_window(self) -> None:
         cv.namedWindow("Image", cv.WINDOW_AUTOSIZE)
         cv.setMouseCallback("Image", print_coords)
 
-    def __update(self) -> None:
+    def _update(self) -> None:
         global img, value_changing
         
         if img is None or not value_changing:
@@ -154,65 +154,65 @@ class CVProto:
         hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
         mask = cv.inRange(hsv, lower_color, upper_color)
-        self.__masked_img = cv.bitwise_and(img, img, mask=mask)
+        self._masked_img = cv.bitwise_and(img, img, mask=mask)
 
-    def __handle_events(self) -> None:
+    def _handle_events(self) -> None:
         global value_changing
         
         k = cv.waitKey(1) & 0xFF
 
-        if self.__source != Source.OBS and k == Constants.KEY_NEXT:
-            if self.__image_index == len(self.__images_path) - 1:
-                self.__is_window_running = False
+        if self._source != Source.OBS and k == Constants.KEY_NEXT:
+            if self._image_index == len(self._images_path) - 1:
+                self._is_window_running = False
                 return
             
-            self.__image_index += 1
+            self._image_index += 1
             
             value_changing = True
 
         if k == Constants.KEY_SWITCH_MASK:
-            self.__show_image = not self.__show_image
-            print("Showing image" if self.__show_image else "Showing mask")
+            self._show_image = not self._show_image
+            print("Showing image" if self._show_image else "Showing mask")
 
         if k == Constants.KEY_EXIT:
-            self.__is_window_running = False
+            self._is_window_running = False
             print("Exiting window")
 
-        if value_changing or self.__source == Source.OBS:
-            self.__update()
+        if value_changing or self._source == Source.OBS:
+            self._update()
 
-    def __render(self) -> None:
+    def _render(self) -> None:
         global img
 
-        if self.__source != Source.OBS and self.__previous_index != self.__image_index:
-            img_path = self.__images_path[self.__image_index].absolute()
+        if self._source != Source.OBS and self._previous_index != self._image_index:
+            img_path = self._images_path[self._image_index].absolute()
             img = cv.imread(str(img_path))
             print("Image loaded: ", img_path.name)
-            self.__previous_index = self.__image_index
+            self._previous_index = self._image_index
 
-        if self.__source == Source.OBS:
-            _, frame = self.__cap.read()
+        if self._source == Source.OBS:
+            _, frame = self._cap.read()
             img = frame
 
         if img is None:
             print("Null image")
-            self.__image_index += 1
+            self._image_index += 1
             return
 
-        if self.__show_image:
+        if self._show_image:
             cv.imshow("Image", img)
         else:
-            cv.imshow("Image", self.__masked_img)
+            cv.imshow("Image", self._masked_img)
 
     def run(self) -> None:
-        while self.__is_window_running:
-            self.__handle_events()
-            self.__render()
+        while self._is_window_running:
+            self._handle_events()
+            self._render()
 
     def quit(self) -> None:
         global img
         img = None
 
-        if hasattr(self, "__cap"):
-            self.__cap.release()
+        if hasattr(self, "_cap"):
+            self._cap.release()
         cv.destroyAllWindows()

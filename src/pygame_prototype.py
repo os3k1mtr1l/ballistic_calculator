@@ -8,89 +8,89 @@ class PGProto:
     def __init__(self):
         pg.init()
 
-        self.__renderer = pg.draw
+        self._renderer = pg.draw
 
-        self.__display = pg.display
-        self.__display.init()
-        self.__display.set_caption("Map sim")
+        self._display = pg.display
+        self._display.init()
+        self._display.set_caption("Map sim")
 
-        self.__screen = self.__display.set_mode(Constants.WINDOW_SIZE)
+        self._screen = self._display.set_mode(Constants.WINDOW_SIZE)
 
         pg.font.init()
-        self.__font = pg.font.SysFont("Scout", 28) # Change font
+        self._font = pg.font.SysFont("Scout", 28) # Change font
 
-        self.__initialize_attributes()
-        self.__is_window_running = True
+        self._initialize_attributes()
+        self._is_window_running = True
 
-    def __initialize_attributes(self) -> None:
-        self.__text_range: pg.Surface
-        self.__text_azimuth: pg.Surface
+    def _initialize_attributes(self) -> None:
+        self._text_range: pg.Surface
+        self._text_azimuth: pg.Surface
 
-        self.__player_pos: Optional[Calculations.Point] = None
-        self.__enemy_pos: Optional[Calculations.Point] = None
+        self._player_pos: Optional[Calculations.Point] = None
+        self._enemy_pos: Optional[Calculations.Point] = None
 
-        self.__update()
+        self._update()
 
-    def __update(self) -> None:
-        angle = Calculations.calculate_angle(self.__player_pos, self.__enemy_pos)
-        meters = Calculations.calculate_distance(self.__player_pos, self.__enemy_pos)
+    def _update(self) -> None:
+        angle = Calculations.calculate_angle(self._player_pos, self._enemy_pos)
+        meters = Calculations.calculate_distance(self._player_pos, self._enemy_pos)
 
         # angle = Calculations.angle_to_cardinal(angle)
 
-        self.__text_range = self.__font.render(Constants.TEXT_RANGE.format(meters=meters), 1, (255, 255, 255))
-        self.__text_azimuth = self.__font.render(Constants.TEXT_AZIMUTH.format(angle=angle), 1, (255, 255, 255))
+        self._text_range = self._font.render(Constants.TEXT_RANGE.format(meters=meters), 1, (255, 255, 255))
+        self._text_azimuth = self._font.render(Constants.TEXT_AZIMUTH.format(angle=angle), 1, (255, 255, 255))
         
-    def __handle_events(self) -> None:
+    def _handle_events(self) -> None:
         event = pg.event.poll()
         
         if event.type == pg.QUIT:
-            self.__is_window_running = False
+            self._is_window_running = False
         elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-            self.__is_window_running = False
+            self._is_window_running = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
-                self.__player_pos = event.pos
+                self._player_pos = event.pos
             elif event.button == 3:
-                self.__enemy_pos = event.pos
+                self._enemy_pos = event.pos
 
-            self.__update()
+            self._update()
 
-    def __draw_grid(self) -> None:
+    def _draw_grid(self) -> None:
         for i in range(0, 600, floor(Constants.PIXELS_PER_SQUARE)):
-            self.__renderer.line(self.__screen, (255, 255, 255), (0, i), (Constants.WINDOW_SIZE.x, i), 1)
-            self.__renderer.line(self.__screen, (255, 255, 255), (i, 0), (i, Constants.WINDOW_SIZE.y), 1)
+            self._renderer.line(self._screen, (255, 255, 255), (0, i), (Constants.WINDOW_SIZE.x, i), 1)
+            self._renderer.line(self._screen, (255, 255, 255), (i, 0), (i, Constants.WINDOW_SIZE.y), 1)
 
-    def __draw_positions(self) -> None:
-        if self.__player_pos is not None:
-            self.__renderer.circle(self.__screen, (255, 255, 255), self.__player_pos, 10)
+    def _draw_positions(self) -> None:
+        if self._player_pos is not None:
+            self._renderer.circle(self._screen, (255, 255, 255), self._player_pos, 10)
         
-        if self.__enemy_pos is not None:
-            self.__renderer.circle(self.__screen, (220, 190, 0), self.__enemy_pos, 10)
+        if self._enemy_pos is not None:
+            self._renderer.circle(self._screen, (220, 190, 0), self._enemy_pos, 10)
 
-    def __draw_line_direction(self) -> None:
-        if self.__player_pos is not None and self.__enemy_pos is not None:
-            self.__renderer.line(self.__screen, (0, 255, 0), self.__player_pos, self.__enemy_pos, 3)
+    def _draw_line_direction(self) -> None:
+        if self._player_pos is not None and self._enemy_pos is not None:
+            self._renderer.line(self._screen, (0, 255, 0), self._player_pos, self._enemy_pos, 3)
 
-    def __draw_interface(self) -> None:
-        self.__screen.blit(self.__text_range, (10, 10))
-        self.__screen.blit(self.__text_azimuth, (10, 42))
+    def _draw_interface(self) -> None:
+        self._screen.blit(self._text_range, (10, 10))
+        self._screen.blit(self._text_azimuth, (10, 42))
 
-    def __render(self) -> None:
-        self.__screen.fill((0, 0, 0))
+    def _render(self) -> None:
+        self._screen.fill((0, 0, 0))
 
-        self.__draw_grid()
-        self.__draw_positions()
-        self.__draw_line_direction()
-        self.__draw_interface()
+        self._draw_grid()
+        self._draw_positions()
+        self._draw_line_direction()
+        self._draw_interface()
 
-        self.__display.flip()
+        self._display.flip()
 
     def run(self) -> None:
-        while self.__is_window_running:
-            self.__handle_events()
-            self.__render()
+        while self._is_window_running:
+            self._handle_events()
+            self._render()
 
     def quit(self) -> None:
         pg.font.quit()
-        self.__display.quit()
+        self._display.quit()
         pg.quit()
