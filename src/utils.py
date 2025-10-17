@@ -24,3 +24,12 @@ def get_images_path(path: Path | str) -> list[Path]:
             )
     
     return images
+
+def normal_hsv_to_cv(hsv: tuple) -> tuple:
+        h, s, v = hsv
+
+        h = h // 2
+        s = s * 255 // 100
+        v = v * 255 // 100
+        
+        return h, s, v
