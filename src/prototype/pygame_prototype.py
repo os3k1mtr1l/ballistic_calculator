@@ -1,7 +1,7 @@
 import pygame as pg
 from math import floor
 import constants as Constants
-import calculations as Calculations
+import processing.calculations as Calculations
 from typing import Optional
 
 class PGProto:
@@ -56,9 +56,19 @@ class PGProto:
             self._update()
 
     def _draw_grid(self) -> None:
-        for i in range(0, 600, floor(Constants.PIXELS_PER_SQUARE)):
+        square_width = floor(Constants.PIXELS_PER_SQUARE)
+        n = 0
+
+        for i in range(0, 600, square_width):
             self._renderer.line(self._screen, (255, 255, 255), (0, i), (Constants.WINDOW_SIZE.x, i), 1)
+            text = self._font.render(f"{n + 1}", 1, (0, 0, 255))
+            self._screen.blit(text, (square_width // 2 + i, square_width // 4))
+            
             self._renderer.line(self._screen, (255, 255, 255), (i, 0), (i, Constants.WINDOW_SIZE.y), 1)
+            text = self._font.render(f"{chr(ord('a') + n)}", 1, (0, 0, 255))
+            self._screen.blit(text, (square_width // 4, square_width // 2 + i))
+
+            n += 1
 
     def _draw_positions(self) -> None:
         if self._player_pos is not None:
@@ -94,3 +104,8 @@ class PGProto:
         pg.font.quit()
         self._display.quit()
         pg.quit()
+
+if __name__ == "__main__":
+    window = PGProto()
+    window.run()
+    window.quit()

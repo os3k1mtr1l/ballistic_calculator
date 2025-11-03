@@ -1,3 +1,4 @@
+from typing import Tuple
 from pathlib import Path
 import os
 
@@ -25,7 +26,7 @@ def get_images_path(path: Path | str) -> list[Path]:
     
     return images
 
-def normal_hsv_to_cv(hsv: tuple) -> tuple:
+def hsv_normal_to_cv(hsv: Tuple[int, int, int]) -> Tuple[int, int, int]:
         h, s, v = hsv
 
         h = h // 2
@@ -33,3 +34,12 @@ def normal_hsv_to_cv(hsv: tuple) -> tuple:
         v = v * 255 // 100
         
         return h, s, v
+
+def hsv_cv_to_normal(hsv: Tuple[int, int, int]) -> Tuple[int, int, int]:
+    h, s, v = hsv
+
+    h = h * 2
+    s = s * 100 // 255
+    v = v * 100 // 255
+    
+    return h, s, v

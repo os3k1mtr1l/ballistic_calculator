@@ -1,13 +1,15 @@
-from pygame_prototype import PGProto
-from opencv_prototype import CVProto, Source
+from window.main_window import MainWindow, Source
 
 from pathlib import Path
 
 def main() -> None:
-    # window: PGProto | CVProto = PGProto()
-    # window: PGProto | CVProto = CVProto(Source.TEST_SAMPLES)
-    window: PGProto | CVProto = CVProto(Source.OBS, capture_device_id=4)
-    # window: PGProto | CVProto = CVProto(Source.USER_PATH, image_path=Path("./test_samples/full_map.png"))
+    kwargs: list[dict] = [
+        { "source": Source.TEST_SAMPLES },
+        { "source": Source.OBS, "capture_device_id": 4 },
+        { "source": Source.USER_PATH, "image_path": Path("./test_samples/marker_in_middle.png") }
+    ]
+    
+    window: MainWindow = MainWindow(**kwargs[0])
 
     window.run()
     window.quit()
